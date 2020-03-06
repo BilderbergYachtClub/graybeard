@@ -16,8 +16,11 @@
     "tailwindcss": "^1.2.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "autoprefixer": "^9.7.4",
     "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
     "gulp-cli": "^2.2.0",
     "gulp-livereload": "^4.0.2",
     "gulp-postcss": "^8.0.0",

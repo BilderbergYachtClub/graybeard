@@ -1,7 +1,8 @@
 const gulp = require('gulp')
 const pug = require('gulp-pug')
-const livereload = require('gulp-livereload')
 const postcss = require('gulp-postcss')
+const babel = require('gulp-babel')
+const livereload = require('gulp-livereload')
 
 gulp.task('html', () => {
   return gulp
@@ -19,8 +20,26 @@ gulp.task('css', () => {
     .pipe(livereload())
 })
 
+gulp.task('js', () => {
+  return gulp
+    .src('src/scripts/app.js')
+    .pipe(
+      babel({
+        presets: ['@babel/env']
+      })
+    )
+    .pipe(gulp.dest('build/scripts'))
+    .pipe(livereload())
+})
+
 gulp.task('dev', () => {
+  let config = {
+    ignoreInitial: false
+  }
+
   livereload.listen()
-  gulp.watch('src/**/*.pug', gulp.series('html'))
-  gulp.watch('src/**/*.css', gulp.series('css'))
+
+  gulp.watch('src/**/*.pug', gulp.series('html'), config)
+  gulp.watch('src/styles/**/*.css', gulp.series('css'), config)
+  gulp.watch('src/scripts/**/*.js', gulp.series('js'), config)
 })
