@@ -7,8 +7,10 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "run-p dev serve",
+    "start": "run-p build:dev dev serve",
+    "clean": "gulp clean",
     "dev": "gulp dev",
+    "build:dev": "gulp build",
     "serve": "w3 build --pushstate"
   },
   "dependencies": {
@@ -21,6 +23,7 @@
     "autoprefixer": "^9.7.4",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
+    "gulp-clean": "^0.4.0",
     "gulp-cli": "^2.2.0",
     "gulp-livereload": "^4.0.2",
     "gulp-postcss": "^8.0.0",

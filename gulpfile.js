@@ -3,6 +3,7 @@ const pug = require('gulp-pug')
 const postcss = require('gulp-postcss')
 const babel = require('gulp-babel')
 const livereload = require('gulp-livereload')
+const clean = require('gulp-clean')
 
 gulp.task('html', () => {
   return gulp
@@ -31,6 +32,12 @@ gulp.task('js', () => {
     .pipe(gulp.dest('build/scripts'))
     .pipe(livereload())
 })
+
+gulp.task('clean', () => {
+  return gulp.src('build', { read: false }).pipe(clean())
+})
+
+gulp.task('build', gulp.parallel('js', 'html', 'css'))
 
 gulp.task('dev', () => {
   let config = {
