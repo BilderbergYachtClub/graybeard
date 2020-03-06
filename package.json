@@ -1,0 +1,24 @@
+{
+  "name": "graybeard",
+  "version": "0.0.1",
+  "description": "Static site generator for boomers",
+  "main": "public/index.html",
+  "author": "Tim Warren",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "run-p watch serve",
+    "watch": "gulp watch",
+    "serve": "w3 build --pushstate"
+  },
+  "dependencies": {
+    "npm-run-all": "^4.1.5"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.2.0",
+    "gulp-pug": "^4.0.1",
+    "pug": "^2.0.4",
+    "w3": "^2.0.1"
+  }
+}

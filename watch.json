@@ -1,0 +1,15 @@
+{
+  "install": {
+    "include": ["^package\\.json$", "^\\.env$"]
+  },
+  "restart": {
+    "exclude": ["^build/"],
+    "include": [
+      "^build/index.html",
+      "^build/global.css",
+      "^src/.*.js$",
+      "^src/.*.pug"
+    ]
+  },
+  "throttle": 100
+}
