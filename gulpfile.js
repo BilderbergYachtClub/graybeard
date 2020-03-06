@@ -1,18 +1,16 @@
-const { src, dest, watch } = require('gulp')
+const gulp = require('gulp')
 const pug = require('gulp-pug')
 const livereload = require('gulp-livereload')
 
-function html () {
-  return src(['src/**/*.pug', '!src/includes/*'])
+gulp.task('html', () => {
+  return gulp
+    .src(['src/**/*.pug', '!src/components/*'])
     .pipe(pug())
-    .pipe(dest('build/'))
+    .pipe(gulp.dest('build/'))
     .pipe(livereload())
-}
+})
 
-// exports.js = js;
-// exports.css = css;
-exports.html = html
-exports.watch = function () {
+gulp.task('dev', () => {
   livereload.listen()
-  watch('src/**/*.pug', html)
-}
+  gulp.watch('src/**/*.pug', gulp.series('html'))
+})
