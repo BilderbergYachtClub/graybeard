@@ -7,7 +7,7 @@ const clean = require('gulp-clean')
 
 gulp.task('html', () => {
   return gulp
-    .src(['src/**/*.pug', '!src/components/*'])
+    .src(['src/**/*.pug', '!src/_*/*'])
     .pipe(pug())
     .pipe(gulp.dest('build/'))
     .pipe(livereload())
@@ -33,11 +33,15 @@ gulp.task('js', () => {
     .pipe(livereload())
 })
 
+gulp.task('assets', () => {
+  return gulp.src('src/assets/**/*').pipe(gulp.dest('build/assets'))
+})
+
 gulp.task('clean', () => {
   return gulp.src('build', { read: false }).pipe(clean())
 })
 
-gulp.task('build', gulp.parallel('js', 'html', 'css'))
+gulp.task('build', gulp.parallel('js', 'html', 'css', 'assets'))
 
 gulp.task('dev', () => {
   let config = {
@@ -47,6 +51,7 @@ gulp.task('dev', () => {
   livereload.listen()
 
   gulp.watch('src/**/*.pug', gulp.series('html'), config)
+  gulp.watch('src/assets/**/*', gulp.series('assets'), config)
   gulp.watch('src/styles/**/*.css', gulp.series('css'), config)
   gulp.watch('src/scripts/**/*.js', gulp.series('js'), config)
 })

@@ -1,10 +1,11 @@
-doctype htmml
-html(lang="en")
-  head
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    link(rel="stylesheet", href="/styles/global.css")
-    script(src="/scripts/app.js")
-    title Graybeard
-  body
-    h1 yup
+extends _layouts/default.pug
+
+block append head
+  title Graybeard
+
+block content
+  div.mt-20.text-center
+    figure
+      img(src="/assets/spokesperson.jpg", alt="Spokesperson").m-auto
+      figcaption.text-3xl.uppercase.text-red-500 Get off my lawn
+
