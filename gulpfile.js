@@ -7,11 +7,13 @@ const assignToPug = require('gulp-assign-to-pug')
 const livereload = require('gulp-livereload')
 const clean = require('gulp-clean')
 
+const { buildDir, dataSource } = require('./graybeard.config')
+
 gulp.task('html', () => {
   return gulp
     .src(['src/**/*.pug', '!src/_*/*', '!src/**/_*'])
     .pipe(pug())
-    .pipe(gulp.dest('build/'))
+    .pipe(gulp.dest(buildDir))
     .pipe(livereload())
 })
 
@@ -19,7 +21,7 @@ gulp.task('css', () => {
   return gulp
     .src(['src/styles/**/*.css', '!src/styles/**/_*.css'])
     .pipe(postcss())
-    .pipe(gulp.dest('build/styles'))
+    .pipe(gulp.dest(`${buildDir}/styles`))
     .pipe(livereload())
 })
 
@@ -31,37 +33,43 @@ gulp.task('js', () => {
         presets: ['@babel/env']
       })
     )
-    .pipe(gulp.dest('build/scripts'))
+    .pipe(gulp.dest(`${buildDir}/scripts`))
     .pipe(livereload())
 })
 
 gulp.task('assets', () => {
-  return gulp.src('src/assets/**/*').pipe(gulp.dest('build/assets'))
+  return gulp
+    .src('src/assets/**/*')
+    .pipe(gulp.dest(`${buildDir}/assets`))
+    .pipe(livereload)
 })
 
 gulp.task('data', () => {
-  return gulp
-    .src('src/data/**/*.json')
-    .pipe(data(file => JSON.parse(file.contents)))
-    .pipe(assignToPug('src/_templates/default.pug'))
-    .pipe(gulp.dest('build/data'))
+  if (!dataSource) return
+
+  let { source, format, template, destination } = dataSource
+
+  let build = () => {
+    return gulp
+      .src(`src/${source}/**/*.${format}`)
+      .pipe(data(file => JSON.parse(file.contents)))
+      .pipe(assignToPug(`src/_templates/${template}.pug`))
+  }
+
+  return build()
+    .pipe(gulp.dest(`${buildDir}/${destination}`))
+    .pipe(livereload())
 })
 
 gulp.task('clean', () => {
-  return gulp.src('build', { read: false }).pipe(clean())
+  return gulp.src(buildDir, { read: false }).pipe(clean({ allowEmpty: true }))
 })
 
 gulp.task('build', gulp.parallel('js', 'html', 'css', 'assets', 'data'))
 
 gulp.task('dev', () => {
-  let config = {
-    ignoreInitial: false
-  }
-
   livereload.listen()
-
-  gulp.watch('src/**/*.pug', gulp.series('html'), config)
-  gulp.watch('src/assets/**/*', gulp.series('assets'), config)
-  gulp.watch('src/styles/**/*.css', gulp.series('css'), config)
-  gulp.watch('src/scripts/**/*.js', gulp.series('js'), config)
+  gulp.watch('src/**/*', gulp.series('html', 'assets', 'css', 'js'), {
+    ignoreInitial: false
+  })
 })
