@@ -64,7 +64,7 @@ gulp.task('clean', () => {
 
 gulp.task('build', gulp.parallel('js', 'html', 'css', 'assets', 'data'))
 
-gulp.task('dev', () => {
+gulp.task('watch', () => {
   livereload.listen()
   gulp.watch('src/**/*', gulp.series('html', 'assets', 'css', 'js'), {
     ignoreInitial: false

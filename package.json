@@ -7,11 +7,11 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start": "run-p build:dev dev serve",
+    "build": "gulp build",
     "clean": "gulp clean",
-    "dev": "gulp dev",
-    "build:dev": "gulp build",
-    "serve": "w3 build --pushstate"
+    "watch": "gulp watch",
+    "serve": "w3 build --pushstate",
+    "dev": "run-p build watch serve"
   },
   "dependencies": {
     "gulp-data": "^1.3.1",
