@@ -26,22 +26,19 @@ gulp.task('css', () => {
 })
 
 gulp.task('js', () => {
+  let config = {
+    presets: ['@babel/env']
+  }
+
   return gulp
     .src('src/scripts/app.js')
-    .pipe(
-      babel({
-        presets: ['@babel/env']
-      })
-    )
+    .pipe(babel(config))
     .pipe(gulp.dest(`${buildDir}/scripts`))
     .pipe(livereload())
 })
 
 gulp.task('assets', () => {
-  return gulp
-    .src('src/assets/**/*')
-    .pipe(gulp.dest(`${buildDir}/assets`))
-    .pipe(livereload)
+  return gulp.src('src/assets/**/*').pipe(gulp.dest(`${buildDir}/assets`))
 })
 
 gulp.task('data', () => {
