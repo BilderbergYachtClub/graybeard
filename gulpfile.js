@@ -2,12 +2,14 @@ const gulp = require('gulp')
 const pug = require('gulp-pug')
 const postcss = require('gulp-postcss')
 const babel = require('gulp-babel')
+const data = require('gulp-data')
+const assignToPug = require('gulp-assign-to-pug')
 const livereload = require('gulp-livereload')
 const clean = require('gulp-clean')
 
 gulp.task('html', () => {
   return gulp
-    .src(['src/**/*.pug', '!src/_*/*'])
+    .src(['src/**/*.pug', '!src/_*/*', '!src/**/_*'])
     .pipe(pug())
     .pipe(gulp.dest('build/'))
     .pipe(livereload())
@@ -37,11 +39,19 @@ gulp.task('assets', () => {
   return gulp.src('src/assets/**/*').pipe(gulp.dest('build/assets'))
 })
 
+gulp.task('data', () => {
+  return gulp
+    .src('src/data/**/*.json')
+    .pipe(data(file => JSON.parse(file.contents)))
+    .pipe(assignToPug('src/_templates/default.pug'))
+    .pipe(gulp.dest('build/data'))
+})
+
 gulp.task('clean', () => {
   return gulp.src('build', { read: false }).pipe(clean())
 })
 
-gulp.task('build', gulp.parallel('js', 'html', 'css', 'assets'))
+gulp.task('build', gulp.parallel('js', 'html', 'css', 'assets', 'data'))
 
 gulp.task('dev', () => {
   let config = {
