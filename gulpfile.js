@@ -1,12 +1,22 @@
 const gulp = require('gulp')
+
+// Utils
 const browserSync = require("browser-sync").create();
-const pug = require('gulp-pug')
-const postcss = require('gulp-postcss')
-const source = require('vinyl-source-stream')
-const rollupStream = require('@rollup/stream')
 const clean = require('gulp-clean')
 const rename = require('gulp-rename')
-const fs = require('fs')
+
+// Pug stuffs
+const pug = require('gulp-pug')
+
+// CSS stuffs
+const postcss = require('gulp-postcss')
+const cleanCSS = require('gulp-clean-css')
+
+// Rollup stuffs
+const { rollup } = require('rollup')
+const resolve = require('@rollup/plugin-node-resolve')
+const commonjs = require('@rollup/plugin-commonjs')
+const babel = require('rollup-plugin-babel')
 
 const { buildDir } = require('./graybeard.config')
 
@@ -19,20 +29,35 @@ gulp.task('clean', () => {
 
 // Compiles javascript using rollup
 gulp.task('javascript', () => {
-  const config = require('./rollup.config.js')
+  const input = 'src/index.js'
 
-  return rollupStream({ ...config, cache })
-    .on('bundle', (bundle) => {
-      cache = bundle
+  return rollup({
+    input,
+    plugins: [
+      resolve(),
+      commonjs(),
+      babel({
+        presets: ['@babel/env'],
+        exclude: 'node_modules/**',
+        babelrc: false
+      })
+    ]
+  }).then(bundle => {
+    bundle.write({
+      file: `${buildDir}/bundle.js`,
+      format: 'umd',
+      name: 'library',
+      sourcemap: true
     })
-    .pipe(source('bundle.js'))
-    .pipe(gulp.dest(`${buildDir}/assets/scripts`))
-    .pipe(browserSync.stream())
+
+    browserSync.stream()
+  })
 })
 
+// Compiles pug files
 gulp.task('markup', () => {
   return gulp
-    .src(['src/**/*.pug', '!src/_lib/**/*.pug'])
+    .src(['src/**/*.pug', '!src/lib/**/*.pug'])
     .pipe(pug())
     .pipe(rename((path) => {
       if (path.basename !== 'index') {
@@ -47,13 +72,14 @@ gulp.task('markup', () => {
 // Compiles stylesheets using postcss
 gulp.task('stylesheets', () => {
   return gulp
-    .src(['src/**/*.css', '!src/**/_components/**/*.css'])
+    .src(['src/index.css', '!src/lib/**/*.css'])
     .pipe(postcss([
       require('postcss-easy-import'),
       require('postcss-nested'),
       require('tailwindcss'),
       require('autoprefixer')
     ]))
+    .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(gulp.dest(buildDir))
     .pipe(browserSync.stream())
 })
@@ -83,7 +109,7 @@ gulp.task('watch', () => {
 
 gulp.task('serve', () => {
   browserSync.init({
-    server: './build/',
+    server: buildDir,
     port: 4200,
     snippetOptions: {
       rule: {
