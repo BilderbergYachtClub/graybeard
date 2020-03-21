@@ -1,72 +1,105 @@
 const gulp = require('gulp')
+const browserSync = require("browser-sync").create();
 const pug = require('gulp-pug')
 const postcss = require('gulp-postcss')
-const babel = require('gulp-babel')
-const data = require('gulp-data')
-const assignToPug = require('gulp-assign-to-pug')
-const livereload = require('gulp-livereload')
+const source = require('vinyl-source-stream')
+const rollupStream = require('@rollup/stream')
 const clean = require('gulp-clean')
+const rename = require('gulp-rename')
+const fs = require('fs')
 
-const { buildDir, dataSource } = require('./graybeard.config')
+const { buildDir } = require('./graybeard.config')
 
-gulp.task('html', () => {
-  return gulp
-    .src(['src/**/*.pug', '!src/_*/*', '!src/**/_*'])
-    .pipe(pug())
-    .pipe(gulp.dest(buildDir))
-    .pipe(livereload())
-})
+let cache
 
-gulp.task('css', () => {
-  return gulp
-    .src(['src/styles/**/*.css', '!src/styles/**/_*.css'])
-    .pipe(postcss())
-    .pipe(gulp.dest(`${buildDir}/styles`))
-    .pipe(livereload())
-})
-
-gulp.task('js', () => {
-  let config = {
-    presets: ['@babel/env']
-  }
-
-  return gulp
-    .src('src/scripts/app.js')
-    .pipe(babel(config))
-    .pipe(gulp.dest(`${buildDir}/scripts`))
-    .pipe(livereload())
-})
-
-gulp.task('assets', () => {
-  return gulp.src('src/assets/**/*').pipe(gulp.dest(`${buildDir}/assets`))
-})
-
-gulp.task('data', () => {
-  if (!dataSource) return
-
-  let { source, format, template, destination } = dataSource
-
-  let build = () => {
-    return gulp
-      .src(`src/${source}/**/*.${format}`)
-      .pipe(data(file => JSON.parse(file.contents)))
-      .pipe(assignToPug(`src/_templates/${template}.pug`))
-  }
-
-  return build()
-    .pipe(gulp.dest(`${buildDir}/${destination}`))
-    .pipe(livereload())
-})
-
+// Destroys the build directory
 gulp.task('clean', () => {
-  return gulp.src(buildDir, { read: false }).pipe(clean({ allowEmpty: true }))
+  return gulp.src(buildDir, { allowEmpty: true }).pipe(clean())
 })
 
-gulp.task('build', gulp.parallel('js', 'html', 'css', 'assets', 'data'))
+// Compiles javascript using rollup
+gulp.task('javascript', () => {
+  const config = require('./rollup.config.js')
 
+  return rollupStream({ ...config, cache })
+    .on('bundle', (bundle) => {
+      cache = bundle
+    })
+    .pipe(source('bundle.js'))
+    .pipe(gulp.dest(`${buildDir}/assets/scripts`))
+    .pipe(browserSync.stream())
+})
+
+gulp.task('markup', () => {
+  return gulp
+    .src(['src/**/*.pug', '!src/_lib/**/*.pug'])
+    .pipe(pug())
+    .pipe(rename((path) => {
+      if (path.basename !== 'index') {
+        path.dirname += '/' + path.basename
+        path.basename = "index"
+      }
+    }))
+    .pipe(gulp.dest(buildDir))
+    .pipe(browserSync.stream())
+})
+
+// Compiles stylesheets using postcss
+gulp.task('stylesheets', () => {
+  return gulp
+    .src(['src/**/*.css', '!src/**/_components/**/*.css'])
+    .pipe(postcss([
+      require('postcss-easy-import'),
+      require('postcss-nested'),
+      require('tailwindcss'),
+      require('autoprefixer')
+    ]))
+    .pipe(gulp.dest(buildDir))
+    .pipe(browserSync.stream())
+})
+
+
+// Copies assets to the build directory
+gulp.task('assets', () => {
+  return gulp.src('src/**/*.{png,jpg,gif,svg,ico}')
+    .pipe(gulp.dest(buildDir))
+})
+
+//
+gulp.task('build', gulp.parallel(
+  'markup',
+  'javascript',
+  'stylesheets',
+  'assets'
+))
+
+// Watches for changes and rebuilds the project as necessary
 gulp.task('watch', () => {
-  livereload.listen()
-  gulp.watch('src/**/*', gulp.series('html', 'assets', 'css', 'js'), {
-    ignoreInitial: false
+  gulp.watch('src/**/*.css', gulp.series('stylesheets'))
+  gulp.watch('src/**/*.{pug, json}', gulp.series('markup'))
+  gulp.watch('src/**/*.{png,jpg,svg,ico}', gulp.series('assets'))
+  gulp.watch('src/**/*.js', gulp.series('javascript'))
+})
+
+gulp.task('serve', () => {
+  browserSync.init({
+    server: './build/',
+    port: 4200,
+    snippetOptions: {
+      rule: {
+        match: /<\/head>/i,
+        fn: function (snippet, match) {
+          return snippet + match;
+        }
+      }
+    }
   })
 })
+
+gulp.task('default',
+  gulp.series(
+    'clean',
+    'build',
+    gulp.parallel('serve', 'watch')
+  )
+)
