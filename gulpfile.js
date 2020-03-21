@@ -8,6 +8,11 @@ const rename = require('gulp-rename')
 // Pug stuffs
 const pug = require('gulp-pug')
 
+// Markdown stuffs
+const frontMatter = require('gulp-front-matter')
+const markdown = require('gulp-markdown')
+const layout = require('gulp-layout')
+
 // CSS stuffs
 const postcss = require('gulp-postcss')
 const cleanCSS = require('gulp-clean-css')
@@ -69,6 +74,17 @@ gulp.task('markup', () => {
     .pipe(browserSync.stream())
 })
 
+// Compiles markdown files
+gulp.task('markdown', () => {
+  return gulp
+    .src('src/**/*.md')
+    .pipe(frontMatter())
+    .pipe(markdown())
+    .pipe(layout(file => file.frontMatter))
+    .pipe(gulp.dest(buildDir))
+    .pipe(browserSync.stream())
+})
+
 // Compiles stylesheets using postcss
 gulp.task('stylesheets', () => {
   return gulp
@@ -94,6 +110,7 @@ gulp.task('assets', () => {
 //
 gulp.task('build', gulp.parallel(
   'markup',
+  'markdown',
   'javascript',
   'stylesheets',
   'assets'
@@ -102,7 +119,8 @@ gulp.task('build', gulp.parallel(
 // Watches for changes and rebuilds the project as necessary
 gulp.task('watch', () => {
   gulp.watch('src/**/*.css', gulp.series('stylesheets'))
-  gulp.watch('src/**/*.{pug, json}', gulp.series('markup'))
+  gulp.watch('src/**/*.pug', gulp.series('markup'))
+  gulp.watch('src/**/*.md', gulp.series('markdown'))
   gulp.watch('src/**/*.{png,jpg,svg,ico}', gulp.series('assets'))
   gulp.watch('src/**/*.js', gulp.series('javascript'))
 })
