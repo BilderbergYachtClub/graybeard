@@ -1,31 +1,18 @@
 const gulp = require('gulp')
-
-// Utils
 const browserSync = require("browser-sync").create();
 const clean = require('gulp-clean')
 const rename = require('gulp-rename')
-
-// Pug stuffs
 const pug = require('gulp-pug')
-
-// Markdown stuffs
 const frontMatter = require('gulp-front-matter')
 const markdown = require('gulp-markdown')
 const layout = require('gulp-layout')
-
-// CSS stuffs
 const postcss = require('gulp-postcss')
 const cleanCSS = require('gulp-clean-css')
-
-// Rollup stuffs
 const { rollup } = require('rollup')
 const resolve = require('@rollup/plugin-node-resolve')
 const commonjs = require('@rollup/plugin-commonjs')
 const babel = require('rollup-plugin-babel')
-
 const { buildDir } = require('./graybeard.config')
-
-let cache
 
 // Destroys the build directory
 gulp.task('clean', () => {
