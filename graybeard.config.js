@@ -1,4 +1,4 @@
 module.exports = {
   buildDir: 'dist',
-  serverPort: 3000
+  port: 3000
 }

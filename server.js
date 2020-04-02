@@ -2,7 +2,7 @@ const express = require('express')
 const livereload = require('livereload')
 const livereloadMiddleware = require('connect-livereload')
 const app = express();
-const { serverPort, buildDir } = require('./graybeard.config')
+const { port, buildDir } = require('./graybeard.config')
 
 console.log(buildDir)
 livereload
@@ -11,6 +11,6 @@ livereload
 
 app.use(livereloadMiddleware({ port: 35729 }))
 app.use(express.static(buildDir))
-app.listen(serverPort)
+app.listen(port)
 
-console.info(`Server started at http://localhost:${serverPort}`)
+console.info(`Server started at http://localhost:${port}`)
