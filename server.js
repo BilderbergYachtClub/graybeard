@@ -1,7 +1,7 @@
 const express = require('express')
 const livereload = require('livereload')
 const livereloadMiddleware = require('connect-livereload')
-const app = express();
+const app = express()
 const { port, buildDir } = require('./graybeard.config')
 
 console.log(buildDir)

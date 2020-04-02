@@ -50,7 +50,7 @@ gulp.task('markup', () => {
     .pipe(rename((path) => {
       if (path.basename !== 'index') {
         path.dirname += '/' + path.basename
-        path.basename = "index"
+        path.basename = 'index'
       }
     }))
     .pipe(gulp.dest(buildDir))
@@ -79,7 +79,6 @@ gulp.task('stylesheets', () => {
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(gulp.dest(buildDir))
 })
-
 
 // Copies assets to the build directory
 gulp.task('assets', () => {

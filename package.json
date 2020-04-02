@@ -9,6 +9,7 @@
   "scripts": {
     "build": "gulp build",
     "clean": "gulp clean",
+    "lint": "standard",
     "dev": "concurrently --raw \"gulp\" \"node server.js\""
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "pug": "^2.0.4",
     "rollup": "^2.1.0",
     "rollup-plugin-babel": "^4.4.0",
-    "rollup-stream": "^1.24.1"
+    "rollup-stream": "^1.24.1",
+    "standard": "^14.3.3"
   }
 }

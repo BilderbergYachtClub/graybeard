@@ -11,10 +11,10 @@ const handleError = error => {
 
 module.exports = {
   templates: {
-    pug() {
+    pug () {
       return pug({ pretty: true }).on('error', handleError)
     },
-    markdown() {
+    markdown () {
       return markdown()
     }
   }
