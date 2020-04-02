@@ -1,5 +1,4 @@
 const gulp = require('gulp')
-const browserSync = require("browser-sync").create();
 const clean = require('gulp-clean')
 const rename = require('gulp-rename')
 const pug = require('gulp-pug')
@@ -41,8 +40,6 @@ gulp.task('javascript', () => {
       name: 'library',
       sourcemap: true
     })
-
-    browserSync.stream()
   })
 })
 
@@ -58,7 +55,6 @@ gulp.task('markup', () => {
       }
     }))
     .pipe(gulp.dest(buildDir))
-    .pipe(browserSync.stream())
 })
 
 // Compiles markdown files
@@ -69,7 +65,6 @@ gulp.task('markdown', () => {
     .pipe(markdown())
     .pipe(layout(file => file.frontMatter))
     .pipe(gulp.dest(buildDir))
-    .pipe(browserSync.stream())
 })
 
 // Compiles stylesheets using postcss
@@ -84,7 +79,6 @@ gulp.task('stylesheets', () => {
     ]))
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(gulp.dest(buildDir))
-    .pipe(browserSync.stream())
 })
 
 
@@ -112,25 +106,4 @@ gulp.task('watch', () => {
   gulp.watch('src/**/*.js', gulp.series('javascript'))
 })
 
-gulp.task('serve', () => {
-  browserSync.init({
-    server: buildDir,
-    port: 4200,
-    snippetOptions: {
-      rule: {
-        match: /<\/head>/i,
-        fn: function (snippet, match) {
-          return snippet + match;
-        }
-      }
-    }
-  })
-})
-
-gulp.task('default',
-  gulp.series(
-    'clean',
-    'build',
-    gulp.parallel('serve', 'watch')
-  )
-)
+gulp.task('default', gulp.series('clean', 'build', 'watch'))
