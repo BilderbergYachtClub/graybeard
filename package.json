@@ -20,11 +20,9 @@
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
-    "@rollup/plugin-commonjs": "^11.0.2",
-    "@rollup/plugin-node-resolve": "^7.1.1",
-    "@rollup/stream": "^0.1.0",
     "@tailwindcss/custom-forms": "^0.2.1",
     "autoprefixer": "^9.7.4",
+    "babel-loader": "^8.1.0",
     "concurrently": "^5.1.0",
     "connect-livereload": "^0.6.1",
     "express": "^4.17.1",
@@ -46,9 +44,8 @@
     "postcss-easy-import": "^3.0.0",
     "postcss-nested": "^4.2.1",
     "pug": "^2.0.4",
-    "rollup": "^2.1.0",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-stream": "^1.24.1",
-    "standard": "^14.3.3"
+    "standard": "^14.3.3",
+    "webpack": "^4.42.1",
+    "webpack-stream": "^5.2.1"
   }
 }

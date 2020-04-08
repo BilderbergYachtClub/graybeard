@@ -1,7 +1,5 @@
-const babel = require('rollup-plugin-babel')
 const clean = require('gulp-clean')
 const cleanCSS = require('gulp-clean-css')
-const commonjs = require('@rollup/plugin-commonjs')
 const frontMatter = require('gulp-front-matter')
 const gulp = require('gulp')
 const htmlmin = require('gulp-htmlmin')
@@ -12,11 +10,10 @@ const postcss = require('gulp-postcss')
 const pug = require('gulp-pug')
 const purgecss = require('gulp-purgecss')
 const rename = require('gulp-rename')
-const resolve = require('@rollup/plugin-node-resolve')
+const webpack = require('webpack-stream')
 
 const { buildDir } = require('./graybeard.config')
 const { handleError } = require('./utils/build')
-const { rollup } = require('rollup')
 
 // Destroys the build directory
 gulp.task('clean', () => {
@@ -25,27 +22,9 @@ gulp.task('clean', () => {
 
 // Compiles javascript using rollup
 gulp.task('javascript', () => {
-  const input = 'src/index.js'
-
-  return rollup({
-    input,
-    plugins: [
-      resolve(),
-      commonjs(),
-      babel({
-        presets: ['@babel/env'],
-        exclude: 'node_modules/**',
-        babelrc: false
-      })
-    ]
-  }).then(bundle => {
-    bundle.write({
-      file: `${buildDir}/bundle.js`,
-      format: 'umd',
-      name: 'library',
-      sourcemap: true
-    })
-  })
+  return gulp.src('src/index.js')
+    .pipe(webpack(require('./webpack.config')))
+    .pipe(gulp.dest(buildDir))
 })
 
 gulp.task('markup', () => {
@@ -82,7 +61,7 @@ gulp.task('html:optimized', gulp.series('markup', 'markdown', () => {
 
 gulp.task('stylesheets', () => {
   return gulp
-    .src(['src/index.css', '!src/lib/**/*.css'])
+    .src('src/index.css')
     .pipe(postcss([
       require('postcss-easy-import'),
       require('postcss-nested'),
