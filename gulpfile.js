@@ -1,20 +1,22 @@
-const gulp = require('gulp')
-const clean = require('gulp-clean')
-const rename = require('gulp-rename')
-const pug = require('gulp-pug')
-const { handleError } = require('./utils/build')
-const frontMatter = require('gulp-front-matter')
-const markdown = require('gulp-markdown')
-const layout = require('gulp-layout')
-const postcss = require('gulp-postcss')
-const cleanCSS = require('gulp-clean-css')
-const inlineSource = require('gulp-inline-source')
-const htmlmin = require('gulp-htmlmin')
-const { rollup } = require('rollup')
-const resolve = require('@rollup/plugin-node-resolve')
-const commonjs = require('@rollup/plugin-commonjs')
 const babel = require('rollup-plugin-babel')
+const clean = require('gulp-clean')
+const cleanCSS = require('gulp-clean-css')
+const commonjs = require('@rollup/plugin-commonjs')
+const frontMatter = require('gulp-front-matter')
+const gulp = require('gulp')
+const htmlmin = require('gulp-htmlmin')
+const inlineSource = require('gulp-inline-source')
+const layout = require('gulp-layout')
+const markdown = require('gulp-markdown')
+const postcss = require('gulp-postcss')
+const pug = require('gulp-pug')
+const purgecss = require('gulp-purgecss')
+const rename = require('gulp-rename')
+const resolve = require('@rollup/plugin-node-resolve')
+
 const { buildDir } = require('./graybeard.config')
+const { handleError } = require('./utils/build')
+const { rollup } = require('rollup')
 
 // Destroys the build directory
 gulp.task('clean', () => {
@@ -69,7 +71,7 @@ gulp.task('markdown', () => {
 })
 
 gulp.task('html:optimized', gulp.series('markup', 'markdown', () => {
-  return gulp.src('dist/**/*.html')
+  return gulp.src(buildDir + '/**/*.html')
     .pipe(inlineSource({ rootpath: process.cwd() + '/' + buildDir }))
     .pipe(htmlmin({
       collapseWhitespace: true,
@@ -78,7 +80,6 @@ gulp.task('html:optimized', gulp.series('markup', 'markdown', () => {
     .pipe(gulp.dest(buildDir))
 }))
 
-// Compiles stylesheets using postcss
 gulp.task('stylesheets', () => {
   return gulp
     .src(['src/index.css', '!src/lib/**/*.css'])
@@ -88,9 +89,16 @@ gulp.task('stylesheets', () => {
       require('tailwindcss'),
       require('autoprefixer')
     ]))
-    .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(gulp.dest(buildDir))
 })
+
+gulp.task('stylesheets:optimized', gulp.series('stylesheets', () => {
+  return gulp
+    .src(buildDir + '/index.css')
+    .pipe(purgecss({ content: [buildDir + '/**/*.html'] }))
+    .pipe(cleanCSS({ compatibility: 'ie8' }))
+    .pipe(gulp.dest(buildDir))
+}))
 
 // Copies assets to the build directory
 gulp.task('assets', () => {
@@ -107,13 +115,12 @@ gulp.task('build', gulp.parallel(
   'assets'
 ))
 
-gulp.task('publish', gulp.series('clean',
-  gulp.parallel(
-    'html:optimized',
-    'javascript',
-    'stylesheets',
-    'assets'
-  )
+gulp.task('publish', gulp.series(
+  'clean',
+  'html:optimized',
+  'stylesheets:optimized',
+  'javascript',
+  'assets'
 ))
 
 // Watches for changes and rebuilds the project as necessary
