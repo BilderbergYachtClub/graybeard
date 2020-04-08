@@ -11,6 +11,7 @@ const pug = require('gulp-pug')
 const purgecss = require('gulp-purgecss')
 const rename = require('gulp-rename')
 const webpack = require('webpack-stream')
+const compiler = require('webpack')
 
 const { buildDir } = require('./graybeard.config')
 const { handleError } = require('./utils/build')
@@ -23,7 +24,7 @@ gulp.task('clean', () => {
 // Compiles javascript using rollup
 gulp.task('javascript', () => {
   return gulp.src('src/index.js')
-    .pipe(webpack(require('./webpack.config')))
+    .pipe(webpack(require('./webpack.config'), compiler))
     .pipe(gulp.dest(buildDir))
 })
 
