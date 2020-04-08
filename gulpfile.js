@@ -93,7 +93,7 @@ gulp.task('build', gulp.parallel(
   'assets'
 ))
 
-gulp.task('publish', gulp.series(
+gulp.task('build:production', gulp.series(
   'clean',
   'html:optimized',
   'stylesheets:optimized',

@@ -7,11 +7,11 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "gulp build",
-    "publish": "gulp publish",
+    "build": "gulp build:production",
     "clean": "gulp clean",
     "lint": "standard",
-    "dev": "concurrently --raw \"gulp\" \"node server.js\""
+    "go": "concurrently --raw \"gulp\" \"now dev\"",
+    "dev": "node server"
   },
   "dependencies": {
     "tailwindcss": "^1.2.0",

@@ -1,4 +1,4 @@
 module.exports = {
-  buildDir: 'dist',
+  buildDir: 'public',
   port: 3000
 }

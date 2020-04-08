@@ -1,5 +1,7 @@
 node_modules/
-dist/
+public/
 **/*.log
 .now
 .DS_Store
+
+.now
