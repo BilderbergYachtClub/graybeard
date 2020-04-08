@@ -8,11 +8,14 @@
   "private": false,
   "scripts": {
     "build": "gulp build",
+    "publish": "gulp publish",
     "clean": "gulp clean",
     "lint": "standard",
     "dev": "concurrently --raw \"gulp\" \"node server.js\""
   },
   "dependencies": {
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-inline-source": "^4.0.0",
     "tailwindcss": "^1.2.0",
     "turbolinks": "^5.2.0"
   },

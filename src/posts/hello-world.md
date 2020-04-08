@@ -1,6 +1,6 @@
 ---
 title: Hello World
-layout: src/lib/layouts/post.pug
+layout: src/template/post.pug
 ---
 
 # Hello World

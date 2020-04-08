@@ -1,11 +1,15 @@
 const gulp = require('gulp')
 const clean = require('gulp-clean')
 const rename = require('gulp-rename')
-const { templates: { pug, markdown } } = require('./utils/build')
+const pug = require('gulp-pug')
+const { handleError } = require('./utils/build')
 const frontMatter = require('gulp-front-matter')
+const markdown = require('gulp-markdown')
 const layout = require('gulp-layout')
 const postcss = require('gulp-postcss')
 const cleanCSS = require('gulp-clean-css')
+const inlineSource = require('gulp-inline-source')
+const htmlmin = require('gulp-htmlmin')
 const { rollup } = require('rollup')
 const resolve = require('@rollup/plugin-node-resolve')
 const commonjs = require('@rollup/plugin-commonjs')
@@ -42,11 +46,10 @@ gulp.task('javascript', () => {
   })
 })
 
-// Compiles pug files
 gulp.task('markup', () => {
   return gulp
-    .src(['src/**/*.pug', '!src/lib/**/*.pug'])
-    .pipe(pug())
+    .src(['src/**/*.pug', '!src/template/**'])
+    .pipe(pug({ pretty: true }).on('error', handleError))
     .pipe(rename((path) => {
       if (path.basename !== 'index') {
         path.dirname += '/' + path.basename
@@ -56,7 +59,6 @@ gulp.task('markup', () => {
     .pipe(gulp.dest(buildDir))
 })
 
-// Compiles markdown files
 gulp.task('markdown', () => {
   return gulp
     .src('src/**/*.md')
@@ -65,6 +67,16 @@ gulp.task('markdown', () => {
     .pipe(layout(file => file.frontMatter))
     .pipe(gulp.dest(buildDir))
 })
+
+gulp.task('html:optimized', gulp.series('markup', 'markdown', () => {
+  return gulp.src('dist/**/*.html')
+    .pipe(inlineSource({ rootpath: process.cwd() + '/' + buildDir }))
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      removeComments: true,
+    }))
+    .pipe(gulp.dest(buildDir))
+}))
 
 // Compiles stylesheets using postcss
 gulp.task('stylesheets', () => {
@@ -93,6 +105,15 @@ gulp.task('build', gulp.parallel(
   'javascript',
   'stylesheets',
   'assets'
+))
+
+gulp.task('publish', gulp.series('clean',
+  gulp.parallel(
+    'html:optimized',
+    'javascript',
+    'stylesheets',
+    'assets'
+  )
 ))
 
 // Watches for changes and rebuilds the project as necessary
