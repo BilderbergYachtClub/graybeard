@@ -16,12 +16,10 @@ const compiler = require('webpack')
 const { buildDir } = require('./graybeard.config')
 const { handleError } = require('./utils/build')
 
-// Destroys the build directory
 gulp.task('clean', () => {
   return gulp.src(buildDir, { allowEmpty: true }).pipe(clean())
 })
 
-// Compiles javascript using rollup
 gulp.task('javascript', () => {
   return gulp.src('src/index.js')
     .pipe(webpack(require('./webpack.config'), compiler))
