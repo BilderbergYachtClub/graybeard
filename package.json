@@ -43,7 +43,7 @@
     "livereload": "^0.9.1",
     "postcss-easy-import": "^3.0.0",
     "postcss-nested": "^4.2.1",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "standard": "^14.3.3",
     "webpack": "^4.42.1",
     "webpack-stream": "^5.2.1"
